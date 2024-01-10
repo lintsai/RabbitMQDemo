@@ -1,0 +1,83 @@
+﻿<script type="text/javascript">
+    var Alltext = "";
+    function RabbitMQSend() {
+        try {
+            var queue = document.getElementById("queue");
+            var queueVal = queue.value;
+            var queueMsg = document.getElementById("queueMsg");
+            var queueMsgVal = queueMsg.value;
+            fetch('/RabbitMQ/Send', {
+                method: 'POST',
+                headers: new Headers({ 'content-type': 'application/json' }),
+                body: JSON.stringify({
+                    'queue':queueVal,
+                    'queueMsg':queueMsgVal
+                })
+            })
+            .then((response) => response.text())
+            .then((text) => {
+                Alltext +=  'Send: ' + text + '\n';
+                var ConsoleArea = document.getElementById('ConsoleArea');
+                ConsoleArea.textContent = Alltext;
+                ConsoleArea.scrollTop = ConsoleArea.scrollHeight;
+            });
+        } catch (error) {
+            console.log(error);
+            Alltext +=  error + '\n';
+            var ConsoleArea = document.getElementById('ConsoleArea');
+            ConsoleArea.textContent = Alltext;
+            ConsoleArea.scrollTop = ConsoleArea.scrollHeight;
+        }
+    };
+    
+    function RabbitMQReceive() {
+        try {
+            var queue = document.getElementById("queue");
+            var queueVal = queue.value;
+            const response = fetch('/RabbitMQ/Receive', {
+                method: 'POST',
+                headers: new Headers({ 'content-type': 'application/json' }),
+                body: JSON.stringify({
+                    'queue':queueVal
+                })
+            })
+            .then((response) => response.text())
+            .then((text) => {
+                Alltext +=  'Receive: ' + text + '\n';
+                var ConsoleArea = document.getElementById('ConsoleArea');
+                ConsoleArea.textContent = Alltext;
+                ConsoleArea.scrollTop = ConsoleArea.scrollHeight;
+            });
+        } catch (error) {
+            console.log(error);
+            Alltext +=  error + '\n';
+            var ConsoleArea = document.getElementById('ConsoleArea');
+            ConsoleArea.textContent = Alltext;
+            ConsoleArea.scrollTop = ConsoleArea.scrollHeight;
+        }
+    };
+
+    function Clear() {
+        Alltext = "";
+        var ConsoleArea = document.getElementById('ConsoleArea');
+        ConsoleArea.textContent = Alltext;
+        ConsoleArea.scrollTop = ConsoleArea.scrollHeight;
+    };
+</script>
+
+Queue Name: 
+<select name="queue" id="queue">
+    <option value="jobmq">Job Message Queue(jobmq)</option>
+    <option value="routemq">Route Message Queue(routemq)</option>
+</select>
+<br>
+Queue Message: 
+<br>
+<textarea type="text" id="queueMsg" name="queueMsg" style="width:500px;height:100px;"></textarea>
+<br>
+<button onclick="RabbitMQSend()">Send</button>
+<br>
+<textarea id="ConsoleArea" style="width:80%;height:200px;background-color: black;color: green;"></textarea>
+<br>
+<button onclick="RabbitMQReceive()">Receive</button>
+<button onclick="Clear()">Clear</button>
